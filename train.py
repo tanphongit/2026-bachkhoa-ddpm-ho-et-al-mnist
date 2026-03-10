@@ -23,12 +23,13 @@ def main():
     epochs = 10
     lr = 1e-3
 
-    # ===== Create folders =====
+    # ===== Create folders (cấu trúc mới) =====
     ensure_dir("data")
-    ensure_dir("checkpoints")
-    ensure_dir("outputs")
-    ensure_dir("outputs/forward_noise")
-    ensure_dir("outputs/samples")
+    ensure_dir("checkpoints/diffusion")
+    ensure_dir("outputs/diffusion")
+    ensure_dir("outputs/diffusion/forward_noise")
+    ensure_dir("outputs/diffusion/progressive")
+    ensure_dir("outputs/diffusion/samples")
 
     # ===== Dataset (Normalize về [-1,1]) =====
     tfm = transforms.Compose([
@@ -47,7 +48,7 @@ def main():
         train_ds,
         batch_size=batch_size,
         shuffle=True,
-        num_workers=0,  # ✅ tránh lỗi pickle Python 3.14
+        num_workers=0,  # tránh lỗi pickle Python 3.14
         drop_last=True
     )
 
@@ -66,14 +67,14 @@ def main():
     x0_demo, _ = next(iter(train_loader))
     x0_demo = x0_demo[:16].to(device)
 
-    save_image_grid(x0_demo, "outputs/forward_noise/x0.png", nrow=4)
+    save_image_grid(x0_demo, "outputs/diffusion/forward_noise/x0.png", nrow=4)
 
     for tval in [0, 50, 100, 150, 199]:
         t = torch.full((x0_demo.size(0),), tval, device=device, dtype=torch.long)
         xt, _ = diffusion.q_sample(x0_demo, t)
         save_image_grid(
             xt,
-            f"outputs/forward_noise/xt_t{tval}.png",
+            f"outputs/diffusion/forward_noise/xt_t{tval}.png",
             nrow=4
         )
 
@@ -109,24 +110,24 @@ def main():
                 "model": model.state_dict(),
                 "T": T
             },
-            f"checkpoints/ddpm_mnist_ep{epoch}.pt"
+            f"checkpoints/diffusion/ddpm_mnist_ep{epoch}.pt"
         )
 
         # ===== Sample preview mỗi epoch =====
         samples = diffusion.sample(model, (16, 1, 28, 28))
         save_image_grid(
             samples,
-            f"outputs/samples/sample_ep{epoch}.png",
+            f"outputs/diffusion/samples/sample_ep{epoch}.png",
             nrow=4
         )
 
     # =====================================================
     # 3) Save loss curve
     # =====================================================
-    plot_loss_curve(losses, "outputs/loss_curve.png")
+    plot_loss_curve(losses, "outputs/diffusion/loss_curve.png")
 
     print("Training complete.")
-    print("Check outputs/ and checkpoints/ folders.")
+    print("Check outputs/diffusion/ and checkpoints/diffusion/ folders.")
 
 
 if __name__ == "__main__":
