@@ -17,13 +17,13 @@ def main():
     )
     print("Device:", device)
 
-    # ===== Hyperparameters (nhẹ cho đồ án 1 tín chỉ) =====
+    # ===== Hyperparameters =====
     T = 200
     batch_size = 128
     epochs = 10
     lr = 1e-3
 
-    # ===== Create folders (cấu trúc mới) =====
+    # ===== Create folders =====
     ensure_dir("data")
     ensure_dir("checkpoints/diffusion")
     ensure_dir("outputs/diffusion")
@@ -48,7 +48,7 @@ def main():
         train_ds,
         batch_size=batch_size,
         shuffle=True,
-        num_workers=0,  # tránh lỗi pickle Python 3.14
+        num_workers=0,
         drop_last=True
     )
 
