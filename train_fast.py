@@ -123,7 +123,7 @@ def main():
         )
 
     # =====================================================
-    # 3) Sample 1 lần cuối thôi
+    # 3) Sample finnal
     # =====================================================
     samples = diffusion.sample(model, (8, 1, 28, 28))
     save_image_grid(
